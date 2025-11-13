@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lyrical — Lyrics to Voice (Animated)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    :root{
+      --bg:#070b17;
+      --card:#0e1425;
+      --accent:#00c4ff;
+      --accent2:#ff6ec7;
+      --muted:#a6b1c2;
+      --text:#e9f0ff;
+      --glow:0 0 12px rgba(0,196,255,0.5);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at 20% 20%, #111936 0%, #070b17 80%);
+      color:var(--text);
+      display:flex;justify-content:center;align-items:flex-start;padding:40px 20px;
+      overflow-x:hidden;
+    }
+    .wrap{width:100%;max-width:1000px;animation:fadeIn 1s ease forwards;}
+    header{display:flex;align-items:center;gap:16px;}
+    .logo{
+      width:70px;height:70px;border-radius:16px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;
+      box-shadow:var(--glow);
+      font-size:22px;letter-spacing:1px;
+      animation:float 3s ease-in-out infinite;
+    }
+    h1{font-size:26px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;color:transparent;}
+    p.lead{color:var(--muted);margin-top:4px;font-size:14px;}
+
+    .card{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:16px;
+      padding:20px;margin-top:20px;
+      backdrop-filter:blur(12px);
+      box-shadow:0 4px 20px rgba(0,0,0,0.3);
+      animation:fadeUp 0.8s ease both;
+    }
+    textarea{
+      width:100%;min-height:160px;padding:14px;border-radius:10px;
+      background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+      color:var(--text);resize:vertical;font-size:14px;
+      transition:0.2s ease;border-left:3px solid var(--accent);
+    }
+    textarea:focus{outline:none;box-shadow:0 0 10px rgba(0,196,255,0.3);}
+
+    label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px;}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+    select,input[type=range]{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text);transition:0.3s ease;}
+    button{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none;color:#fff;font-weight:600;padding:10px 18px;border-radius:10px;
+      cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;
+    }
+    button:hover{transform:translateY(-2px);box-shadow:0 0 14px rgba(0,196,255,0.4);}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.15);}
+
+    footer{text-align:center;margin-top:30px;color:var(--muted);font-size:13px;}
+
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    .wave-bg{
+      position:fixed;bottom:0;left:0;width:100%;height:200px;
+      background:linear-gradient(90deg,var(--accent) 0%, var(--accent2) 100%);
+      opacity:0.08;filter:blur(40px);
+      animation:waveMove 8s ease-in-out infinite alternate;
+      z-index:-1;
+    }
+    @keyframes waveMove{0%{transform:translateX(0)}100%{transform:translateX(-50px)}}
+  </style>
+</head>
+<body>
+  <div class="wave-bg"></div>
+  <div class="wrap">
+    <header>
+      <div class="logo">LY</div>
+      <div>
+        <h1>Lyrical — Feel the Flow</h1>
+        <p class="lead">Turn your words into rhythm and sound — animated aesthetic prototype.</p>
+      </div>
+    </header>
+
+    <div class="card">
+      <label>Lyrics</label>
+      <textarea id="lyrics" placeholder="Write your lyrical vibe...">Chalo bolte hain, lyrical vibe — sample lyrics.</textarea>
+
+      <div class="controls">
+        <select id="voice"></select>
+        <input id="rate" type="range" min="0.5" max="2" step="0.1" value="1">
+        <input id="pitch" type="range" min="0.5" max="2" step="0.1" value="1">
+      </div>
+
+      <div class="controls">
+        <button id="play">▶ Play Voice</button>
+        <button id="stop" class="ghost">■ Stop</button>
+        <button id="playMix">🎧 Play Mix</button>
+        <button id="pauseMix" class="ghost">⏸ Pause</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Instrumental (optional)</label>
+      <input id="file" type="file" accept="audio/*" />
+      <audio id="instr" controls style="width:100%;margin-top:10px"></audio>
+      <input id="instrVol" type="range" min="0" max="1" step="0.01" value="0.7" style="margin-top:10px">
+    </div>
+
+    <footer>Made with 💙 by Honour — powered by browser TTS & creative vibes.</footer>
+  </div>
+
+  <script>
+    const voiceSelect=document.getElementById('voice');
+    const rate=document.getElementById('rate');
+    const pitch=document.getElementById('pitch');
+    const lyrics=document.getElementById('lyrics');
+    const play=document.getElementById('play');
+    const stop=document.getElementById('stop');
+    const playMix=document.getElementById('playMix');
+    const pauseMix=document.getElementById('pauseMix');
+    const instr=document.getElementById('instr');
+    const instrVol=document.getElementById('instrVol');
+    const file=document.getElementById('file');
+
+    let voices=[];
+    function populateVoices(){voices=speechSynthesis.getVoices().sort((a,b)=>a.name.localeCompare(b.name));
+      voiceSelect.innerHTML='';voices.forEach((v,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=v.name+' - '+v.lang;voiceSelect.appendChild(opt);});}
+    populateVoices();if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=populateVoices;
+
+    function speak(txt){if(!txt)return;if(speechSynthesis.speaking)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);const v=voices[voiceSelect.value];if(v)u.voice=v;u.rate=parseFloat(rate.value);u.pitch=parseFloat(pitch.value);speechSynthesis.speak(u);}
+
+    play.onclick=()=>speak(lyrics.value);
+    stop.onclick=()=>speechSynthesis.cancel();
+
+    playMix.onclick=async()=>{if(instr.src){try{await instr.play();}catch(e){}}speak(lyrics.value);}
+    pauseMix.onclick=()=>{if(!instr.paused)instr.pause();speechSynthesis.cancel();}
+    file.onchange=e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);instr.src=url;instr.load();}
+    instrVol.oninput=()=>{instr.volume=parseFloat(instrVol.value)};
+  </script>
+</body>
+</html>
